@@ -7,7 +7,41 @@
 
 import numpy as np
 from numpy.linalg import norm
-import math
+
+
+def center_matrix(A):
+     
+    """
+        Calculate the centered matrix for a given input using its column means.
+        Inputs:
+            - A: A 2D array of values
+        Outputs:
+            - A_centered: A 2D centered matrix 
+    """
+
+    # Find column means
+    means = A.mean(axis = 0)
+    
+    # Subtract column means from each column
+    A_centered = A - means
+
+    return A_centered
+
+
+def projection(A, prin_comp):
+     
+    """
+        Project an input matrix into Eigenspace for dimensionality reduction.
+        Inputs:
+            - A: A 2D array of values
+            - prin_comp: A 2D array of Eigenvectors
+        Outputs:
+            - projected: A 2D array of the input matrix projected in Eigenspace
+    """
+
+    projected = np.matmul(A, prin_comp.transpose())
+
+    return projected
 
 
 def power_method(A, v, tol):
@@ -27,8 +61,8 @@ def power_method(A, v, tol):
     eigenvalue = norm(v)
     eigenvector = v/eigenvalue
 
-    a = True
-    while a == True:
+    loop = True
+    while loop:
         last = eigenvalue
 
         # Find dot product
@@ -75,47 +109,3 @@ def deflate(A, eigenvalue, eigenvector):
             A_mod[i][j] = A[i][j] - (eigenvalue*eigenvector[i]*eigenvector[j])
     
     return A_mod
-
-
-def test_power_method():
-
-    """
-        Test function to ensure the power_method function is working as expected.
-    """    
-   
-    A = [[4.0, 6.0], [1.0, 3.0]]
-    v = [1.0, 1.0]
-    tol = 1e-7
-
-    vect_soln = [0.94868417, 0.31622515]
-    val_soln = 6
-    
-    eigenvalue, eigenvector = power_method(A, v, tol)
-    assert abs(np.array(eigenvector)[0] - np.array(vect_soln)[0])/np.array(vect_soln)[0] < math.sqrt(tol)
-    assert abs(np.array(eigenvector)[1] - np.array(vect_soln)[1])/np.array(vect_soln)[1] < math.sqrt(tol)
-    assert abs(eigenvalue - val_soln)/val_soln < tol
-
-    print("Power method test has passed")
-
-    return 
-
-
-def test_deflate():
-
-    """
-        Test function to ensure the deflate function is working as exptected.
-    """
-
-    A = [[1.0, 2.0, 0.0], [2.0, 1.0, 0.0], [0.0, 0.0, 2.0]]
-    eigenvalue = 3
-    eigenvector = [1.0, 1.0, 0.0]
-    tol = 1e-7
-
-    C_soln = np.array([[-0.5, 0.5, 0], [0.5, -0.5, 0], [0, 0, 2]])
-
-    C = deflate(A, eigenvalue, eigenvector)
-    assert abs(norm(C - C_soln)) < tol
-
-    print("Deflate test has passed")
-
-    return
