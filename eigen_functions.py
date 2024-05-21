@@ -1,6 +1,6 @@
 '''
-    The following script contains functions to numerically calculate eigenvalues
-    and eigenvectors for a given matrix.
+    The following script contains functions to carry out Principal Component
+    Analysis (PCA) on a dataset.
     Author: Rohit Rajagopal
 '''
 
@@ -16,32 +16,35 @@ def center_matrix(A):
         Inputs:
             - A: A 2D array of values
         Outputs:
-            - A_centered: A 2D centered matrix 
+            - centered: A 2D centered matrix 
     """
 
     # Find column means
     means = A.mean(axis = 0)
     
     # Subtract column means from each column
-    A_centered = A - means
+    centered = A - means
+    
+    return centered
 
-    return A_centered
 
-
-def projection(A, prin_comp):
+def covariance_matrix(A):
      
     """
-        Project an input matrix into Eigenspace for dimensionality reduction.
+        Calculate the empirical covariance matrix for a given input.
         Inputs:
             - A: A 2D array of values
-            - prin_comp: A 2D array of Eigenvectors
         Outputs:
-            - projected: A 2D array of the input matrix projected in Eigenspace
+            - cov: A 2D square covariance matrix 
     """
 
-    projected = np.matmul(A, prin_comp.transpose())
+    # Find number of rows in input matrix
+    rows = A.shape[0]
+    
+    # Matrix multiplication to find covariance matrix
+    cov = (1 / rows - 1) * np.matmul(A, A.transpose())
 
-    return projected
+    return cov
 
 
 def power_method(A, v, tol):
@@ -50,7 +53,7 @@ def power_method(A, v, tol):
         Compute the largest eigenvalue and corresponding eigenvector for a given matrix.
         Inputs:
             - A: A 2D array of values
-            - v: A list respresenting the initial unit vector
+            - v: A list respresenting the initial vector
             - tol: Tolerance value to check for convergence
         Outputs:
             - eigenvalue: Largest eigenvalue
@@ -77,7 +80,7 @@ def power_method(A, v, tol):
 
         # Identify if convergence has occured (same eigenvalue as last iteration)
         if (abs((last - eigenvalue)/eigenvalue)) < tol:
-            a = False
+            loop = False
 
     # Check the sign of the eigenvalue
     if ((np.dot(A, eigenvector)[pos])/(eigenvector[pos])) < 0:
@@ -101,11 +104,11 @@ def deflate(A, eigenvalue, eigenvector):
     """
 
     eigenvector = np.array(eigenvector/norm(eigenvector))
-    A_mod = np.array(A)
+    deflated = np.array(A)
 
     # Perform matrix multiplication to obtain next largest eigenpair
     for i in range(len(eigenvector)):
         for j in range(len(eigenvector)):
-            A_mod[i][j] = A[i][j] - (eigenvalue*eigenvector[i]*eigenvector[j])
+            deflated[i][j] = A[i][j] - (eigenvalue*eigenvector[i]*eigenvector[j])
     
-    return A_mod
+    return deflated
