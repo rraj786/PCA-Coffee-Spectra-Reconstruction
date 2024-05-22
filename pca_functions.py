@@ -25,7 +25,7 @@ def center_matrix(A):
     # Subtract column means from each column
     centered = A - means
     
-    return centered
+    return means, centered
 
 
 def covariance_matrix(A):
@@ -42,7 +42,7 @@ def covariance_matrix(A):
     rows = A.shape[0]
     
     # Matrix multiplication to find covariance matrix
-    cov = (1 / rows - 1) * np.matmul(A, A.transpose())
+    cov = np.matmul(A.T, A) / (rows - 1)
 
     return cov
 
@@ -76,14 +76,14 @@ def power_method(A, v, tol):
 
         # Get eigenvalue estimate
         eigenvalue = norm(eigenvector)
-        eigenvector = eigenvector/eigenvalue
+        eigenvector = eigenvector / eigenvalue
 
         # Identify if convergence has occured (same eigenvalue as last iteration)
-        if (abs((last - eigenvalue)/eigenvalue)) < tol:
+        if (abs((last - eigenvalue) / eigenvalue)) < tol:
             loop = False
 
     # Check the sign of the eigenvalue
-    if ((np.dot(A, eigenvector)[pos])/(eigenvector[pos])) < 0:
+    if ((np.dot(A, eigenvector)[pos]) / (eigenvector[pos])) < 0:
         eigenvalue = -eigenvalue
     else:
         eigenvalue = abs(eigenvalue)
@@ -100,10 +100,10 @@ def deflate(A, eigenvalue, eigenvector):
             - eigenvalue: Largest eigenvalue
             - eigenvector: A list representing the largest eigenvector
         Outputs:
-            - A_mod: A modified 2D array of values
+            - deflated: A modified 2D array of values
     """
 
-    eigenvector = np.array(eigenvector/norm(eigenvector))
+    eigenvector = np.array(eigenvector / norm(eigenvector))
     deflated = np.array(A)
 
     # Perform matrix multiplication to obtain next largest eigenpair
