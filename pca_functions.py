@@ -104,11 +104,8 @@ def deflate(A, eigenvalue, eigenvector):
     """
 
     eigenvector = np.array(eigenvector / norm(eigenvector))
-    deflated = np.array(A)
 
-    # Perform matrix multiplication to obtain next largest eigenpair
-    for i in range(len(eigenvector)):
-        for j in range(len(eigenvector)):
-            deflated[i][j] = A[i][j] - (eigenvalue*eigenvector[i]*eigenvector[j])
+    # Subtract outer product of eigenvector to obtain next largest eigenpair
+    deflated = A - eigenvalue * np.outer(eigenvector, eigenvector)
     
     return deflated
